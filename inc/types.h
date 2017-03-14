@@ -26,7 +26,7 @@ typedef enum {
 } const_t;
 
 typedef enum {
-    PAR_NON_FERM, MAUV_TOK,
+    NO_ERR, PAR_NON_FERM, MAUV_TOK,
     MANQ_TOK
 } syntaxerrtype_t;
 
