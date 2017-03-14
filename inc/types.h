@@ -1,6 +1,5 @@
 #ifndef GRAPH_TYPES_H
-#define GRAPH_TYPES
-
+#define GRAPH_TYPES_H
 
 typedef enum {
     REEL,
@@ -12,7 +11,6 @@ typedef enum {
     CONSTANTE
 } toktype_t;
 
-
 typedef enum {
     COS, SIN, TAN,
     ARCCOS, ARCSIN, ARCTAN,
@@ -22,7 +20,6 @@ typedef enum {
     ABS, ENT, DECIMAL,
     FACTORIEL,
 } fonct_t;
-
 
 typedef enum {
     CST_PI, CST_E
@@ -36,12 +33,10 @@ typedef union {
     const_t constante;
 } tokval_t;
 
-
 typedef struct {
     toktype_t type;
     tokval_t valeur;
 } token_t;
-
 
 typedef struct tokenarb_st tokenarb_t;
 struct tokenarb_st {
@@ -50,7 +45,6 @@ struct tokenarb_st {
     tokenarb_t* droite;
 };
 
-
 typedef struct tokenlist_st tokenlist_t;
 struct tokenlist_st {
     token_t token;
@@ -58,4 +52,9 @@ struct tokenlist_st {
 };
 
 
-#endif
+typedef struct {
+    float x;
+    float y;
+} graphpt_t;
+
+#endif // GRAPH_TYPES_H
