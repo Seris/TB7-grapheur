@@ -49,12 +49,12 @@ tokenlist_t* nvfn(fonct_t fonction, tokenlist_t* suiv){
     return t;
 }
 
-// ( 4 * ( x + 3 ) ) + sin(4 + x)
+// (( 4 * ( x + 3 ) ) + sin(4 + x))
 tokenlist_t* create_test_list(){
     tokenlist_t* root =
-        nvparo(nvreel(4,nvop('*',nvparo(nvvar(nvop('+',nvreel(3,nvparf(
-        nvparf(nvop('+',nvfn(SIN,nvparo(nvreel(4,nvop('+',nvvar(nvparf(
-        NULL))))))))))))))));
+        nvparo(nvparo(nvparo(nvreel(4,nvop('*',nvparo(nvvar(nvop('+',nvreel(3,nvparf(
+        nvparf(nvop('+',nvfn(SIN,nvparo(nvreel(4,nvop('+',nvvar(nvparf(nvparf(
+        NULL)))))))))))))))))));
 
     return root;
 }
@@ -89,6 +89,9 @@ void print_test_list(tokenlist_t* list){
             case CONSTANTE:
             printf("a");
             break;
+
+            default:
+            printf("???");
         }
 
         print_test_list(list->suivant);
