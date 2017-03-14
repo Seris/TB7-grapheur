@@ -8,7 +8,8 @@ typedef enum {
     FONCTION,
     PAR_O,
     PAR_F,
-    CONSTANTE
+    CONSTANTE,
+    ERREUR
 } toktype_t;
 
 typedef enum {
@@ -26,8 +27,12 @@ typedef enum {
 } const_t;
 
 typedef enum {
-    NO_ERR, PAR_NON_FERM, MAUV_TOK,
-    MANQ_TOK
+    NO_ERR,
+    PAR_NON_FERM,
+    PAR_MANQ,
+    MAUV_TOK,
+    MANQ_TOK,
+    MAUV_REEL
 } errtype_t;
 
 
@@ -66,7 +71,7 @@ typedef struct {
 
 typedef struct {
     errtype_t type;
-    int position;
+    token_t token;
 } err_t;
 
 
