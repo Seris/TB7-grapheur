@@ -28,7 +28,7 @@ typedef enum {
 typedef enum {
     NO_ERR, PAR_NON_FERM, MAUV_TOK,
     MANQ_TOK
-} syntaxerrtype_t;
+} errtype_t;
 
 
 typedef union {
@@ -65,9 +65,9 @@ typedef struct {
 
 
 typedef struct {
-    syntaxerrtype_t type;
+    errtype_t type;
     int position;
-} syntaxerr_t;
+} err_t;
 
 
 #endif // GRAPH_TYPES_H
