@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "inc/syntax-check.h"
 #include "inc/types.h"
 #include "inc/test.h"
-#include "inc/parse.h"
 
 void print_node(tokenarb_t* arb, int level){
     switch (arb->token.type) {
@@ -53,15 +53,51 @@ void print_tree(tokenarb_t* arb){
     }
 }
 
+void print_error(err_t* err){
+    switch (err->type) {
+        case NO_ERR:
+        printf("Aucune erreur");
+        break;
+
+        case PAR_NON_FERM:
+        printf("Parenthèse non fermée");
+        break;
+
+        case PAR_MANQ:
+        printf("Parenthèse manquante");
+        break;
+
+        case MANQ_TOK:
+        printf("Token manquant");
+        break;
+
+        case MAUV_TOK:
+        printf("Mauvais token");
+        break;
+
+        default:
+        printf("????");
+    }
+
+    if(err->type != NO_ERR){
+        printf(" (pos: %d)", err->token.position);
+    }
+
+    printf("\n");
+}
+
 int main(int argc, char* argv[]){
     tokenlist_t* test = create_test_list();
     print_test_list(test);
 
-    err_t error = { .type = NO_ERR };
+    err_t error;
 
     tokenlist_t* cursor = test;
-    tokenarb_t* abr = parse_group_token(&cursor, &error);
-    print_tree(abr);
+    tokenarb_t* abr = parse_token_list(cursor, &error);
+    print_error(&error);
+    if(error.type == NO_ERR){
+        print_tree(abr);
+    }
 
     return EXIT_SUCCESS;
 }
