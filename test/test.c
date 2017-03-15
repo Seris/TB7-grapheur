@@ -4,13 +4,136 @@
 #include "../inc/test.h"
 #include "../inc/types.h"
 
-int testlvl = 0;
+void print_token(token_t token){
+    switch(token.type){
+        case REEL:
+        printf("%d ", (int) token.valeur.reel);
+        break;
+
+        case OPERATEUR:
+        printf("%c ", token.valeur.operateur);
+        break;
+
+        case VAR:
+        printf("x ");
+        break;
+
+        case FONCTION:
+        printf("f ");
+        break;
+
+        case CONSTANTE:
+        printf("a ");
+        break;
+
+        case PAR_O:
+        printf("( ");
+        break;
+
+        case PAR_F:
+        printf(") ");
+        break;
+
+        default:
+        printf(" |?????| ");
+    }
+}
+
+void print_node(tokenarb_t* arb, int level){
+    printf("%.2d: ", level);
+    switch (arb->token.type) {
+        case REEL:
+        printf("%.2d: REEL(%.2f)\n", level, arb->token.valeur.reel);
+        break;
+
+        case OPERATEUR:
+        printf("%.2d: OP(%c)\n", level, arb->token.valeur.operateur);
+        break;
+
+        case VAR:
+        printf("%.2d: VAR\n", level);
+        break;
+
+        case FONCTION:
+        printf("%.2d: FONCTION\n", level);
+        break;
+
+        case CONSTANTE:
+        printf("%.2d: CONSTANTE\n", level);
+        break;
+
+        default:
+        printf("%.2d: ??????\n", level);
+    }
+}
+
+void print_tree_inc(tokenarb_t* arb, int level){
+    if(arb->gauche != NULL){
+        printf("G");
+        print_node(arb->gauche, level+1);
+        print_tree_inc(arb->gauche, level+1);
+    }
+
+    if(arb->droite != NULL){
+        printf("D");
+        print_node(arb->droite, level+1);
+        print_tree_inc(arb->droite, level+1);
+    }
+}
+
+void print_tree(tokenarb_t* arb){
+    if(arb != NULL){
+        printf("R");
+        print_node(arb, 0);
+        print_tree_inc(arb, 0);
+    }
+}
+
+void print_error(err_t* err){
+    if(err->type != NO_ERR && err->token.position > -1){
+        for(int i = 0; i < err->token.position*2; i++) putchar(' ');
+        printf("^\n");
+    } else if(err->type != NO_ERR){
+        printf("\n");
+    }
+
+    if(err->type != NO_ERR){
+        for(int i = 0; i < err->token.position*2; i++) putchar(' ');
+    }
+
+    switch (err->type) {
+        case NO_ERR:
+        printf("Aucune erreur");
+        break;
+
+        case PAR_F_ATTENDU:
+        printf("Parenthèse fermante attendue");
+        break;
+
+        case EXPR_ATTENDU:
+        printf("Expression attendue");
+        break;
+
+        case MANQ_TOK:
+        printf("Token manquant");
+        break;
+
+        case TOKEN_NON_ATTENDU:
+        printf("Token non attendu");
+        break;
+
+        default:
+        printf("????");
+    }
+
+    printf("\n");
+}
+
 
 tokenlist_t* nvreel(float reel, tokenlist_t* suiv){
     tokenlist_t* t = malloc(sizeof(tokenlist_t));
     t->token.type = REEL;
     t->token.valeur.reel = reel;
-    t->token.position = testlvl++;
     t->suivant = suiv;
     return t;
 }
@@ -18,7 +141,6 @@ tokenlist_t* nvreel(float reel, tokenlist_t* suiv){
 tokenlist_t* nvop(char op, tokenlist_t* suiv){
     tokenlist_t* t = malloc(sizeof(tokenlist_t));
     t->token.type = OPERATEUR;
-    t->token.position = testlvl++;
     t->token.valeur.operateur = op;
     t->suivant = suiv;
     return t;
@@ -27,7 +149,6 @@ tokenlist_t* nvop(char op, tokenlist_t* suiv){
 tokenlist_t* nvparo(tokenlist_t* suiv){
     tokenlist_t* t = malloc(sizeof(tokenlist_t));
     t->token.type = PAR_O;
-    t->token.position = testlvl++;
     t->suivant = suiv;
     return t;
 }
@@ -35,7 +156,6 @@ tokenlist_t* nvparo(tokenlist_t* suiv){
 tokenlist_t* nvparf(tokenlist_t* suiv){
     tokenlist_t* t = malloc(sizeof(tokenlist_t));
     t->token.type = PAR_F;
-    t->token.position = testlvl++;
     t->suivant = suiv;
     return t;
 }
@@ -43,7 +163,6 @@ tokenlist_t* nvparf(tokenlist_t* suiv){
 tokenlist_t* nvvar(tokenlist_t* suiv){
     tokenlist_t* t = malloc(sizeof(tokenlist_t));
     t->token.type = VAR;
-    t->token.position = testlvl++;
     t->suivant = suiv;
     return t;
 }
@@ -52,7 +171,6 @@ tokenlist_t* nvfn(fonct_t fonction, tokenlist_t* suiv){
     tokenlist_t* t = malloc(sizeof(tokenlist_t));
     t->token.type = FONCTION;
     t->token.valeur.fonction = fonction;
-    t->token.position = testlvl++;
     t->suivant = suiv;
     return t;
 }
@@ -61,54 +179,27 @@ tokenlist_t* nvcst(const_t cst, tokenlist_t* suiv){
     tokenlist_t* t = malloc(sizeof(tokenlist_t));
     t->token.type = CONSTANTE;
     t->token.valeur.constante = cst;
-    t->token.position = testlvl++;
     t->suivant = suiv;
     return t;
 }
 
-// (( 4 * ( x + 3 ) ) + sin(4 + x))
-tokenlist_t* create_test_list(){
-    tokenlist_t* root = nvparo(nvcst(CST_E, nvop('^', nvreel(2, nvparf(NULL)))));
-    return root;
-}
-
 void print_test_list(tokenlist_t* list){
     if(list != NULL){
-        switch(list->token.type){
-            case REEL:
-            printf("%.2f", list->token.valeur.reel);
-            break;
-
-            case OPERATEUR:
-            printf(" %c ", list->token.valeur.operateur);
-            break;
-
-            case VAR:
-            printf("x");
-            break;
-
-            case FONCTION:
-            printf("f%d ", list->token.valeur.fonction);
-            break;
-
-            case PAR_O:
-            printf("(");
-            break;
-
-            case PAR_F:
-            printf(")");
-            break;
-
-            case CONSTANTE:
-            printf("a");
-            break;
-
-            default:
-            printf("???");
-        }
-
+        print_token(list->token);
         print_test_list(list->suivant);
     } else {
         printf("\n");
     }
+}
+
+//sqrt(sin(4a))
+tokenlist_t* create_test_list(){
+    tokenlist_t* root = nvfn(SQRT, nvfn(SIN, nvreel(4, nvcst(CST_E, NULL))));
+
+    tokenlist_t* curlist = root;
+    for (size_t i = 0; curlist != NULL; i++, curlist = curlist->suivant) {
+        curlist->token.position = i;
+    }
+
+    return root;
 }

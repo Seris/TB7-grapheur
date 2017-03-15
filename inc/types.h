@@ -28,13 +28,17 @@ typedef enum {
 
 typedef enum {
     NO_ERR,
-    PAR_NON_FERM,
-    PAR_MANQ,
-    MAUV_TOK,
-    MANQ_TOK,
+
+    // Analyse lexicale
     MAUV_REEL,
     MAUV_FONC_CONST,
-    MAUV_CHAR
+    MAUV_CHAR,
+
+    // Analyse syntaxique
+    PAR_F_ATTENDU,
+    EXPR_ATTENDU,
+    TOKEN_NON_ATTENDU,
+    MANQ_TOK,
 } errtype_t;
 
 
