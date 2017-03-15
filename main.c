@@ -3,6 +3,7 @@
 #include "inc/syntax-check.h"
 #include "inc/types.h"
 #include "inc/test.h"
+#include "inc/interface.h"
 
 int main(int argc, char* argv[]){
     tokenlist_t* test = create_test_list();
@@ -16,6 +17,8 @@ int main(int argc, char* argv[]){
     if(error.type == NO_ERR){
         print_tree(abr);
     }
+
+    lancer_interface(argc, argv);
 
     return EXIT_SUCCESS;
 }

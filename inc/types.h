@@ -72,6 +72,7 @@ struct tokenlist_st {
 typedef struct {
     double x;
     double y;
+    int valide;
 } graphpt_t;
 
 
