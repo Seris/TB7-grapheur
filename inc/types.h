@@ -32,7 +32,9 @@ typedef enum {
     PAR_MANQ,
     MAUV_TOK,
     MANQ_TOK,
-    MAUV_REEL
+    MAUV_REEL,
+    MAUV_FONC_CONST,
+    MAUV_CHAR
 } errtype_t;
 
 
