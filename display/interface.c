@@ -2,6 +2,7 @@
 #include "../inc/types.h"
 #include "../inc/evaluateur.h"
 #include "../inc/syntax-check.h"
+#include "../inc/analyselexic.h"
 #include "../inc/test.h"
 
 float echelleX = 1.0;
@@ -251,8 +252,8 @@ void frappe(int c)
         }
     case 'l':
         // Lib�ration
-        /*fonctionPourFreeListe(listeJetons);
-        fonctionPourFreeArbre(arbre);*/
+        detruire_liste(listeJetons);
+        free_arbre_token(arbre);
         supprime_tbx(points);
         aucunPoint = 1;
         break;
@@ -302,7 +303,7 @@ void dessin(void)
 int lancer_interface(int ac, char *av[])
 {
     char formule[255];
-    int succes = 1; /// CHANGER CA OMG.
+    int succes = 0; /// CHANGER CA OMG.
     err_t erreur;
     printf("Bonjour ! Que diriez-vous d'entrer une formule ?\n\n--->");
     do
@@ -315,28 +316,17 @@ int lancer_interface(int ac, char *av[])
         }
         printf("Vous avez tape : %s", formule);
 
-        listeJetons = create_test_list();
+        listeJetons = analyselexical(formule, &erreur);
         if(listeJetons != NULL){
             arbre = parse_token_list(listeJetons, &erreur);
             if(arbre != NULL){
                 succes = 1;
-                print_tree(arbre);
             } else {
                 print_error(&erreur);
             }
         } else {
             print_error(&erreur);
         }
-
-        // 1er groupe : Conversion de la formule en liste de jetons
-        /*listeJetons = la1ereFonctionMDR(formule, &erreur); // Est-ce qu'il renvoie NULL en cas d'erreur ?
-        if(exposerErreur(erreur) == 0)
-        {
-            // 2 groupe : Conversion de la liste de jetons en arbre
-            arbre = la2eFonctionMDR(listeJetons, &erreur); // Est-ce qu'il renvoie NULL en cas d'erreur ?
-            if(exposerErreur(erreur) == 0)
-                succes = 1;
-        }*/
     } while(!succes); // Tant qu'il y a une erreur
 
     char chaine[255];
