@@ -464,7 +464,6 @@ tokenlist_t* analyselexical(char*tableau,err_t* erreur)
     token_p=initialisation();
     erreur->type = NO_ERR;
     int i;
-    int position=1;
 
 
 
@@ -483,27 +482,22 @@ tokenlist_t* analyselexical(char*tableau,err_t* erreur)
         case '%':
         case '^':
 
-          token_p=ajout_operateur(token_p,tableau[i],position);
-          position++;
+          token_p=ajout_operateur(token_p,tableau[i],i);
           break;
 
 
         case '(':
 
-            token_p=ajout_parenthese_ouvrante(token_p,position) ;
-            position++;
+            token_p=ajout_parenthese_ouvrante(token_p,i) ;
             break;
 
         case ')':
 
-            token_p=ajout_parenthese_fermante(token_p,position) ;
-            position++;
+            token_p=ajout_parenthese_fermante(token_p,i) ;
             break;
 
         case 'x':case 'X':
-
-           token_p=ajout_variable(token_p,position);
-           position++;
+           token_p=ajout_variable(token_p,i);
            break;
 
         case ' ':
@@ -519,9 +513,8 @@ tokenlist_t* analyselexical(char*tableau,err_t* erreur)
                char fonction_recup [20];
 
                fonction_recuperation(tableau,&i,fonction_recup);
-               token_p=ajout_fonction_constante(token_p,fonction_recup,liste_fonctions, liste_constantes ,position,erreur);
+               token_p=ajout_fonction_constante(token_p,fonction_recup,liste_fonctions, liste_constantes ,i,erreur);
                i--;
-               position++;
            }
 
            else if (verif_reel (tableau + i) )
@@ -529,25 +522,24 @@ tokenlist_t* analyselexical(char*tableau,err_t* erreur)
                 int position_reel ;
                 float r= renvoi_nombre_si_pas_erreur(tableau+i , &position_reel);
 
-                token_p = ajout_reel(token_p , position, r);
+                token_p = ajout_reel(token_p , i, r);
 
                 if (verif_list_null (token_p) )
                 {
                     erreur -> type = MAUV_REEL;
-                    erreur -> token.position = position;
+                    erreur -> token.position = i;
                 }
                 else
                 {
 
                     i = i + position_reel -1 ;
-                    position++;
                 }
 
             }
            else
            {
             erreur->type=MAUV_CHAR;
-            erreur->token.position=position;
+            erreur->token.position=i;
             token_p = detruire_liste(token_p);
            }
 

@@ -217,8 +217,6 @@ graphpt_t * generer_points(tokenarb_t * arbre, float xmin, float xmax, float pas
         nbpoints = (int)((xmax - xmin)/pas) +1;
     }
 
-    printf("Nb points : %d\n", nbpoints);
-
     graphpt_t * points_tbx = (graphpt_t *)malloc(nbpoints*sizeof(graphpt_t));
     if(points_tbx == NULL)
         printf("OMG ARRETEZ TOUT LE MALLOC A FAIL.");

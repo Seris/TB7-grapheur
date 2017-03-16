@@ -18,6 +18,8 @@ float echelleY = 1.0;
 float decalageX = 0.0;
 float decalageY = 0.0;
 
+char formule[255];
+
 tokenlist_t * listeJetons;
 tokenarb_t * arbre;
 graphpt_t * points;
@@ -131,7 +133,6 @@ void tracerCourbe()
     graphpt_t pointAncre, p1, p2;
     for(i = 0; i < nbValeurs; i++)
     {
-        printf("Point %d valide. (%f\t%f\t%d)\n", i, points[i].x, points[i].y, points[i].valide);
 
         if (points[i].valide == 1)
         {
@@ -176,11 +177,6 @@ void tracerDerivee()
         graphpt_t pnTranslate = versBase(pointNegatif);
         graphpt_t ppTranslate = versBase(pointPositif);
         line(pnTranslate.x, pnTranslate.y, ppTranslate.x, ppTranslate.y);
-        printf("D�rivee en %f tracee", valeursDerivees[0].x);
-        printf("valeursDerivees0 = %f    valeursDerivees1 = %f", valeursDerivees[0].x, valeursDerivees[1].x);
-        printf("\nvaleursDerivees0Y = %f    valeursDerivees1Y = %f", valeursDerivees[0].y, valeursDerivees[1].y);
-        printf("\n pointNegatif.x = %f    pointNegatif.y = %f", pointNegatif.x, pointNegatif.y);
-        printf("\n pointPositif.x = %f    pointPositif.y = %f", pointPositif.x, pointPositif.y);
     }
 
 }
@@ -189,7 +185,6 @@ void tracerDerivee()
 
 void chargerValeurs()
 {
-    printf("Chargement des valeurs de %f a %f.\n", pointDepartX, pointArriveeX);
     supprime_tbx(points);
     points = NULL;
     printf("Tableau supprime.\n");
@@ -202,9 +197,7 @@ void chargerDerivees()
 {
     graphpt_t curseur = nvPoint(2*(curseurX/(float)windowWidth)-1, -2*(curseurY/(float)windowHeight)+1, 1);
     graphpt_t curseurVersRepere = versRepere(curseur);
-    printf("Chargement des valeurs pour la d�riv�e en %f", curseurVersRepere.x);
     valeursDerivees = generer_points(arbre, curseurVersRepere.x, curseurVersRepere.x+0.05, 0.06);
-    printf("curseurVersRepere.x+0.05 = %f", curseurVersRepere.x+0.05);
 }
 
 /// Fonctions de la fen�tre
@@ -311,6 +304,7 @@ void dessin(void)
     outtextxy(-0.95, -0.7, "C / O : Centrer / Origine");
     outtextxy(-0.95, -0.8, "R : Recharger");
     outtextxy(-0.95, -0.9, "L : Liberer la memoire");
+    outtextxy(-0.95, 0.90, formule);
 
     // Affichage du rep�re
     p1 = versRepere(nvPoint(-1, -1, 1));
@@ -404,7 +398,6 @@ void menu(int ac, char *av[])
 
 void lancerGrapheur(int ac, char *av[])
 {
-    char formule[255];
     int succes = 0;
     err_t erreur;
     printf("Bonjour ! Que diriez-vous d'entrer une formule ?\n\n--->");

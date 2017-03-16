@@ -67,7 +67,7 @@ tokenarb_t* parse_function(tokenlist_t** elem_cur, err_t* err){
     if(elem != NULL){
         node->gauche = parse_expression(&elem, err);
     } else {
-        set_error_at_end(err, MANQ_TOK);
+        set_error_at_end(err, EXPR_ATTENDU);
     }
 
     *elem_cur = elem;
