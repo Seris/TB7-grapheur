@@ -53,7 +53,7 @@ int verif_operateur_et_parentheses (char character)
 /* verif_last_character : verifie si le dernier character du reel (identif� par strtof, cf plus bas) est un operateur, parenthese, espace, ou '\0'*/
 int verif_last_character_exist(char * lastcharacter)
 {
-    if( verif_operateur_et_parentheses(lastcharacter[0]) || lastcharacter[0] == 32 || lastcharacter[0]=='\0'  )
+    if( verif_operateur_et_parentheses(lastcharacter[0]) || lastcharacter[0] == 32 || lastcharacter[0]=='\0' || lastcharacter[0] == '\n'  )
     {
         return 1;
     }
@@ -192,8 +192,6 @@ tokenlist_t * ajout_reel( tokenlist_t * token_p , int position, float reel)
     }
     else
     {
-        printf("ERREUR !\n");
-        printf("Destruction de la liste ! \n") ;
         token_p = detruire_liste(token_p);
 
     }
@@ -422,10 +420,8 @@ tokenlist_t * ajout_fonction_constante(tokenlist_t*token_p, char* fonction, char
     // Si la fonction est mal �crite, ou ne correspond pas
     else
     {
-            printf("ERREUR !\n");
             erreur->type=MAUV_FONC_CONST;
             erreur->token.position=position;
-            printf("Destruction de la liste\n");
             token_p = detruire_liste(token_p);
     }
 return token_p;
@@ -550,12 +546,9 @@ tokenlist_t* analyselexical(char*tableau,err_t* erreur)
             }
            else
            {
-            printf("ERREUR ! Element inconnu\n");
             erreur->type=MAUV_CHAR;
             erreur->token.position=position;
-            printf("Destruction de la liste\n");
             token_p = detruire_liste(token_p);
-
            }
 
 

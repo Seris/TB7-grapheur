@@ -17,7 +17,11 @@ void frappe(int c);
 
 void dessin(void);
 
-int lancer_interface(int ac, char* av[]);
+void menu(int ac, char *av[]);
+
+void lancerGrapheur(int ac, char *av[]);
+
+void chargerValeurs();
 
 /**
 * main

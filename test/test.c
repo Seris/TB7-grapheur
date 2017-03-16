@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../inc/test.h"
 #include "../inc/types.h"
@@ -89,44 +90,55 @@ void print_tree(tokenarb_t* arb){
     }
 }
 
-void print_error(err_t* err){
-    if(err->type != NO_ERR && err->token.position > -1){
-        for(int i = 0; i < err->token.position*2; i++) putchar(' ');
+void print_error(char* formula, err_t err){
+    if(err.type != NO_ERR){
+        printf("Erreur dans l'expression:\nf(x) = %s", formula);
+
+        int spaces;
+        if(err.token.position > -1){
+            spaces = err.token.position + 6;
+        } else {
+            spaces = strlen(formula) + 6;
+        }
+        for(int i = 0; i < spaces; i++) putchar(' ');
         printf("^\n");
-    } else if(err->type != NO_ERR){
-        printf("\n");
+        for(int i = 0; i < spaces; i++) putchar(' ');
+
+        switch (err.type) {
+            case PAR_F_ATTENDU:
+            printf("Parenthèse fermante attendue\n");
+            break;
+
+            case EXPR_ATTENDU:
+            printf("Expression attendue\n");
+            break;
+
+            case MANQ_TOK:
+            printf("Token manquant\n");
+            break;
+
+            case TOKEN_NON_ATTENDU:
+            printf("Token non attendu\n");
+            break;
+
+            case MAUV_REEL:
+            printf("Réel mal formatté\n");
+            break;
+
+            case MAUV_FONC_CONST:
+            printf("Fonction ou constante inconnue\n");
+            break;
+
+            case MAUV_CHAR:
+            printf("Caractère non attendu\n");
+            break;
+
+            default:
+            printf("WTFFFFF");
+            exit(EXIT_FAILURE);
+        }
     }
 
-    if(err->type != NO_ERR){
-        for(int i = 0; i < err->token.position*2; i++) putchar(' ');
-    }
-
-    switch (err->type) {
-        case NO_ERR:
-        printf("Aucune erreur");
-        break;
-
-        case PAR_F_ATTENDU:
-        printf("Parenthèse fermante attendue");
-        break;
-
-        case EXPR_ATTENDU:
-        printf("Expression attendue");
-        break;
-
-        case MANQ_TOK:
-        printf("Token manquant");
-        break;
-
-        case TOKEN_NON_ATTENDU:
-        printf("Token non attendu");
-        break;
-
-        default:
-        printf("????");
-    }
-
-    printf("\n");
 }
 
 

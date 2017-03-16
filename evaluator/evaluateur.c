@@ -40,7 +40,7 @@ float identifier_operateur(tokenarb_t* arbre, float i, char * valide){
     case '*':
         return gauche * droit;
         break;
-    case '/': // le dénominateur ne doit pas être nul
+    case '/': // le d�nominateur ne doit pas �tre nul
         if (fabsf(droit) > (pow(10, -4)))
             return gauche / droit;
         *valide = 0;
@@ -49,7 +49,7 @@ float identifier_operateur(tokenarb_t* arbre, float i, char * valide){
     case '-':
         return gauche - droit;
         break;
-    case '^': // un nombre négatif ne peut pas être élevé à une puissance décimale
+    case '^': // un nombre n�gatif ne peut pas �tre �lev� � une puissance d�cimale
         if (!((gauche < 0) && (droit != floor(droit))) && !((fabsf(gauche) < (pow(10, -4))) && (droit <= 0)))
             return powf(evaluer(arbre->gauche, i, valide), evaluer(arbre->droite, i, valide));
         *valide = 0;
@@ -126,19 +126,19 @@ float identifier_fonction(tokenarb_t* arbre, float i, char * valide){
     case TAN:
         return tanf(d);
         break;
-    case SQRT: // le contenu de la racine doit être positif
+    case SQRT: // le contenu de la racine doit �tre positif
         if(d>=0)
             return sqrtf(d);
         *valide = 0;
         return 0;
         break;
-    case ARCCOS: // le cosinus inverse a [-1;1] pour ensemble de définition
+    case ARCCOS: // le cosinus inverse a [-1;1] pour ensemble de d�finition
         if((d>=(-1)) && (d<=1))
             return acosf(d);
         *valide = 0;
         return 0;
         break;
-    case ARCSIN:  // le sinus inverse a [-1;1] pour ensemble de définition
+    case ARCSIN:  // le sinus inverse a [-1;1] pour ensemble de d�finition
         if((d>=(-1)) && (d<=1))
             return asinf(d);
         *valide = 0;
@@ -156,7 +156,7 @@ float identifier_fonction(tokenarb_t* arbre, float i, char * valide){
     case TANH:
         return tanhf(d);
         break;
-    case FACTORIEL: // la factorielle d'un nombre décimal ou négatif n'existe pas
+    case FACTORIEL: // la factorielle d'un nombre d�cimal ou n�gatif n'existe pas
         if((fabsf(d-(int)d) < (pow(10, -4))) && (d>=0))
             return factoriel(d);
         *valide = 0;
@@ -165,13 +165,13 @@ float identifier_fonction(tokenarb_t* arbre, float i, char * valide){
     case EXP:
         return expf(d);
         break;
-    case LN: // la fonction ln est définie à partir de 0
+    case LN: // la fonction ln est d�finie � partir de 0
         if(d > 0)
             return logf(d);
         *valide = 0;
         return 0;
         break;
-    case LOG: // la fonction log est définie à partir de 0
+    case LOG: // la fonction log est d�finie � partir de 0
         if(d > 0)
             return log10f(d);
         *valide = 0;
@@ -196,14 +196,15 @@ float identifier_fonction(tokenarb_t* arbre, float i, char * valide){
 }
 
 void supprime_tbx(graphpt_t * points_tbx){
-    free(points_tbx);
+    if(points_tbx != NULL)
+        free(points_tbx);
 }
 
 graphpt_t * generer_points(tokenarb_t * arbre, float xmin, float xmax, float pas){
 
     int nbpoints;
 
-    //calcul du nombre de points à renvoyer
+    //calcul du nombre de points � renvoyer
     if ((((xmax - xmin) / pas)-((int)((xmax - xmin) / pas))) != 0)
     {
         // le dernier point se trouve avant la valeur max.
@@ -219,17 +220,20 @@ graphpt_t * generer_points(tokenarb_t * arbre, float xmin, float xmax, float pas
     printf("Nb points : %d\n", nbpoints);
 
     graphpt_t * points_tbx = (graphpt_t *)malloc(nbpoints*sizeof(graphpt_t));
+    if(points_tbx == NULL)
+        printf("OMG ARRETEZ TOUT LE MALLOC A FAIL.");
     graphpt_t point;
-    char * valide = (char*) &point.valide;
+    char * valide = &point.valide;
 
     float i;
-    for(i = xmin; i < xmax; i += pas) // calcul des ordonnées avant la fin de la fenetre
+    int ind=0;
+    for(i = xmin; i < xmax; i += pas) // calcul des ordonn�es avant la fin de la fenetre
     {
-
         point.valide = 1;
         point.x = i;
         point.y = evaluer(arbre, i, valide);
-        points_tbx[(int)((i-xmin)/pas)] = point;
+        points_tbx[ind] = point;
+        ind++;
     }
     point.valide = 1; //calcul du dernier point de la fenetre ne respectant pas le pas
     point.x = xmax;
@@ -238,75 +242,3 @@ graphpt_t * generer_points(tokenarb_t * arbre, float xmin, float xmax, float pas
 
     return points_tbx;
 }
-/*
-int main()
-{
-    //test
-
-
-    tokenarb_t arbre1, arbre2, arbre3, arbre4;
-    arbre1.token.type = FONCTION;
-    arbre1.token.valeur.fonction = ABS;
-    arbre2.token.type = VAR;
-    arbre3.token.type = REEL;
-    arbre3.token.valeur.reel = 3;
-    arbre4.token.type = OPERATEUR;
-    arbre4.token.valeur.operateur = '^';
-
-
-    tokenarb_t* arbre = &arbre1;
-    tokenarb_t* arbre42 = &arbre4;
-    arbre->gauche = &arbre4;
-    arbre42->gauche = &arbre3;
-    arbre42->droite = &arbre2;
-
-    float xmax, xmin, pas, i;
-    xmax = 6.3;
-    xmin = -5;
-    pas = 0.5;
-
-    int nbpoints;
-
-    //fin test
-
-    //calcul du nombre de points à renvoyer
-    if ((((xmax - xmin) / pas)-((int)((xmax - xmin) / pas))) != 0)
-    {
-        // le dernier point se trouve avant la valeur max.
-        // on en ajoute un.
-        nbpoints = (int)((xmax - xmin)/pas) +2;
-    }
-    else
-    {
-        // le dernier point est la valeur max.
-        nbpoints = (int)((xmax - xmin)/pas) +1;
-    }
-
-    graphpt_t point;
-    graphpt_t * points_tbx = (graphpt_t *)malloc(nbpoints*sizeof(graphpt_t));
-    char * valide = &point.valide;
-
-    for(i = xmin; i < xmax; i += pas)
-    {
-
-        point.valide = 1;
-        point.x = i;
-        point.y = evaluer(arbre, i, valide);
-        points_tbx[(int)((i-xmin)/pas)] = point;
-    }
-    point.valide = 1;
-    point.x = xmax;
-    point.y = evaluer(arbre, xmax, valide);
-    points_tbx[nbpoints-1] = point;
-
-
-    // affichage du test
-    int j;
-    printf("%d\n",nbpoints);
-    for(j=0;j<nbpoints;j++){
-        printf("%f %f %d\n",points_tbx[j].x,points_tbx[j].y,points_tbx[j].valide);
-    }
-
-    return 0; //points_tbx;
-
-}*/

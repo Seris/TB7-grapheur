@@ -5,6 +5,14 @@
 #include "../inc/analyselexic.h"
 #include "../inc/test.h"
 
+extern int curseurX;
+extern int curseurY;
+extern int windowWidth;
+extern int windowHeight;
+
+char clique = 0;
+graphpt_t ancreGlisse;
+
 float echelleX = 1.0;
 float echelleY = 1.0;
 float decalageX = 0.0;
@@ -13,6 +21,7 @@ float decalageY = 0.0;
 tokenlist_t * listeJetons;
 tokenarb_t * arbre;
 graphpt_t * points;
+graphpt_t * valeursDerivees;
 char aucunPoint = 0;
 float pointDepartX = -1.0;
 float pointArriveeX = 1.0;
@@ -28,24 +37,6 @@ void indiquerPosition(int p)
         printf(" ");
     }
     printf("^\n");
-}
-
-char exposerErreur(err_t erreur)
-{
-    switch(erreur.type)
-    {
-    case NO_ERR:
-        return 0;
-        break;
-    case MAUV_REEL:
-        indiquerPosition(erreur.token.position + 4);
-        printf("Reel illegal.\n");
-        break;
-
-    default:
-        printf("erreur\n");
-    }
-    return 1;
 }
 
 /// Fonctions graphiques
@@ -164,27 +155,35 @@ void tracerCourbe()
     }
 }
 
-/*void tracerDerivee()
+void tracerDerivee()
 {
     graphpt_t pointNegatif;
     graphpt_t pointPositif;
-    if (valeursDerivees[0].v == 0 || valeursDerivees[1].v == 0)
+    if (valeursDerivees[0].valide == 0 || valeursDerivees[1].valide == 0)
         printf("Pas de derivee en ce point");
     else
     {
+        pointNegatif.valide = 1;
+        pointPositif.valide = 1;
         //pointNegatif.x = -valeursDerivees[0].x;
-        pointNegatif.x = points[0].x;
+        pointNegatif.x = pointDepartX;
         //pointPositif.x = 3 * valeursDerivees[0].x;
         pointPositif.x = pointArriveeX;
-        pointNegatif.y = ((valeursDerivees[1].y - valeursDerivees[0].y)/((valeursDerivees[1].x - valeursDerivees[0].x)*0.1)) * (pointNegatif.x - valeursDerivees[0].x) + valeursDerivees[0].y;
-        pointPositif.y = ((valeursDerivees[1].y - valeursDerivees[0].y)/((valeursDerivees[1].x - valeursDerivees[0].x)*0.1)) * (pointPositif.x - valeursDerivees[0].x) + valeursDerivees[0].y;
+        //pointNegatif.y = (valeursDerivees[1].y - valeursDerivees[0].y)/(0.05) * (pointNegatif.x - valeursDerivees[0].x) + valeursDerivees[0].y;
+        //pointPositif.y = (valeursDerivees[1].y - valeursDerivees[0].y)/(0.05) * (pointPositif.x - valeursDerivees[0].x) + valeursDerivees[0].y;
+        pointNegatif.y = ((valeursDerivees[1].y - valeursDerivees[0].y)/0.05) * pointNegatif.x + (valeursDerivees[0].y-((valeursDerivees[1].y - valeursDerivees[0].y)/0.05) * valeursDerivees[0].x);
+        pointPositif.y = ((valeursDerivees[1].y - valeursDerivees[0].y)/0.05) * pointPositif.x + (valeursDerivees[0].y-((valeursDerivees[1].y - valeursDerivees[0].y)/0.05) * valeursDerivees[0].x);
         graphpt_t pnTranslate = versBase(pointNegatif);
         graphpt_t ppTranslate = versBase(pointPositif);
-        line(pointNegatif.x, pointNegatif.y, pointPositif.x, pointPositif.y);
+        line(pnTranslate.x, pnTranslate.y, ppTranslate.x, ppTranslate.y);
         printf("D�rivee en %f tracee", valeursDerivees[0].x);
+        printf("valeursDerivees0 = %f    valeursDerivees1 = %f", valeursDerivees[0].x, valeursDerivees[1].x);
+        printf("\nvaleursDerivees0Y = %f    valeursDerivees1Y = %f", valeursDerivees[0].y, valeursDerivees[1].y);
+        printf("\n pointNegatif.x = %f    pointNegatif.y = %f", pointNegatif.x, pointNegatif.y);
+        printf("\n pointPositif.x = %f    pointPositif.y = %f", pointPositif.x, pointPositif.y);
     }
 
-}*/
+}
 
 /// Fonctions des valeurs
 
@@ -192,10 +191,20 @@ void chargerValeurs()
 {
     printf("Chargement des valeurs de %f a %f.\n", pointDepartX, pointArriveeX);
     supprime_tbx(points);
+    points = NULL;
     printf("Tableau supprime.\n");
     points = generer_points(arbre, pointDepartX, pointArriveeX, pas);
     printf("Points generes.\n");
     aucunPoint = 0;
+}
+
+void chargerDerivees()
+{
+    graphpt_t curseur = nvPoint(2*(curseurX/(float)windowWidth)-1, -2*(curseurY/(float)windowHeight)+1, 1);
+    graphpt_t curseurVersRepere = versRepere(curseur);
+    printf("Chargement des valeurs pour la d�riv�e en %f", curseurVersRepere.x);
+    valeursDerivees = generer_points(arbre, curseurVersRepere.x, curseurVersRepere.x+0.05, 0.06);
+    printf("curseurVersRepere.x+0.05 = %f", curseurVersRepere.x+0.05);
 }
 
 /// Fonctions de la fen�tre
@@ -225,6 +234,10 @@ void frappe(int c)
     case '4':
         echelleX *= 2;
         break;
+    case 'o':
+        decalageX = 0;
+        decalageY = 0;
+        break;
     case 'z':
         decalageY += echelleY * 0.3;
         break;
@@ -251,10 +264,9 @@ void frappe(int c)
             break;
         }
     case 'l':
-        // Lib�ration
-        detruire_liste(listeJetons);
         free_arbre_token(arbre);
         supprime_tbx(points);
+        points = NULL;
         aucunPoint = 1;
         break;
     }
@@ -264,8 +276,10 @@ void dessin(void)
 {
     printf("Dessin.\n");
 
-    setcolor(1.0, 1.0, 1.0); // Blanc
+    char output[50];
+
     // Dessin des axes
+    setcolor(1.0, 1.0, 1.0); // Blanc
     graphpt_t p1, p2;
     p1 = versBase(nvPoint(-10000000, 0, 1));
     p2 = versBase(nvPoint(10000000, 0, 1));
@@ -273,12 +287,28 @@ void dessin(void)
     p1 = versBase(nvPoint(0, -10000000, 1));
     p2 = versBase(nvPoint(0, 10000000, 1));
     line(p1.x, p1.y, p2.x, p2.y);
-    // Dessin des fl�ches : la flemme
+
+    // Affichage du curseur
+    graphpt_t curseur = nvPoint(2*(curseurX/(float)windowWidth)-1, -2*(curseurY/(float)windowHeight)+1, 1);
+    graphpt_t curseurVersRepere = versRepere(curseur);
+    char prefixeX[50] = "x=";
+    snprintf(output, 50, "%f", curseurVersRepere.x);
+    strcat(prefixeX, output);
+    outtextxy(0.70, -0.85, prefixeX);
+    char prefixeY[50] = "y=";
+    snprintf(output, 50, "%f", curseurVersRepere.y);
+    strcat(prefixeY, output);
+    outtextxy(0.70, -0.95, prefixeY);
+
+    setcolor(1, 0, 0);
+    line(curseur.x - 0.025, curseur.y, curseur.x + 0.025, curseur.y);
+    line(curseur.x, curseur.y - 0.025, curseur.x, curseur.y + 0.025);
 
     // Affichage du menu
+    setcolor(1, 1, 1);
     outtextxy(-0.95, -0.5, "ZQSD : Deplacement");
     outtextxy(-0.95, -0.6, "+- / 2468 : Zoom");
-    outtextxy(-0.95, -0.7, "C : Centrer");
+    outtextxy(-0.95, -0.7, "C / O : Centrer / Origine");
     outtextxy(-0.95, -0.8, "R : Recharger");
     outtextxy(-0.95, -0.9, "L : Liberer la memoire");
 
@@ -286,7 +316,6 @@ void dessin(void)
     p1 = versRepere(nvPoint(-1, -1, 1));
     p2 = versRepere(nvPoint(1, 1, 1));
 
-    char output[50];
     snprintf(output, 50, "%f", p1.x);
     outtextxy(-1, 0, output);
     snprintf(output, 50, "%f", p2.x);
@@ -298,12 +327,85 @@ void dessin(void)
 
     if(!aucunPoint)
         tracerCourbe();
+
+    chargerDerivees();
+    tracerDerivee();
 }
 
-int lancer_interface(int ac, char *av[])
+void sourisOnclick(int x, int y)
+{
+
+}
+
+/// Fonctions du menu
+
+void effEcr() // Fonction de qualit�
+{
+    //printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+    #ifdef _WIN32
+    system("cls");
+    #else
+    system("clear");
+    #endif
+}
+
+void lireFichier(char * adresse)
+{
+    FILE* fichier = NULL;
+    fichier = fopen(adresse, "r");
+    if(fichier == NULL)
+        printf("Le fichier %s n'existe pas sac a foin.", adresse);
+    else
+    {
+        char ligne[80] = {' '};
+        void * retour;
+        do {
+            printf("%s", ligne);
+            retour = fgets(ligne, 80, fichier);
+
+        } while(retour != NULL);
+        fclose(fichier);
+    }
+}
+
+void menu(int ac, char *av[])
+{
+    char chaine[5] = {' '};
+    while(strcmp(chaine, "0\n") != 0)
+    {
+        effEcr();
+        printf("===== Grapheur =====\n\n\n\n");
+        printf("Veuillez choisir une option :\n\n");
+        printf("1. Saisir une formule\n");
+        printf("2. Consulter le manuel\n");
+        printf("3. Voir les credits\n");
+        printf("0. Quitter\n\n\n");
+
+        fgets(chaine, 5, stdin);
+
+        if(!strcmp(chaine, "1\n"))
+        {
+            lancerGrapheur(ac, av);
+        }
+        else if(!strcmp(chaine, "2\n"))
+        {
+            effEcr();
+            lireFichier("README/Manuel.txt");
+            getchar();
+        }
+        else if(!strcmp(chaine, "3\n"))
+        {
+            effEcr();
+            lireFichier("README/Credits.txt");
+            getchar();
+        }
+    }
+}
+
+void lancerGrapheur(int ac, char *av[])
 {
     char formule[255];
-    int succes = 0; /// CHANGER CA OMG.
+    int succes = 0;
     err_t erreur;
     printf("Bonjour ! Que diriez-vous d'entrer une formule ?\n\n--->");
     do
@@ -319,19 +421,20 @@ int lancer_interface(int ac, char *av[])
         listeJetons = analyselexical(formule, &erreur);
         if(listeJetons != NULL){
             arbre = parse_token_list(listeJetons, &erreur);
+            detruire_liste(listeJetons);
             if(arbre != NULL){
                 succes = 1;
             } else {
-                print_error(&erreur);
+                print_error(formule, erreur);
             }
         } else {
-            print_error(&erreur);
+            print_error(formule, erreur);
         }
     } while(!succes); // Tant qu'il y a une erreur
 
     char chaine[255];
     succes = 0;
-    printf("Nous vous en remercions.\n\nTapez une borne, SVP :\n\n--->");
+    printf("Nous vous en remercions.\n\nTapez la borne inferieure, SVP :\n\n--->");
     while(!succes)
     {
         fgets(chaine, 255, stdin);
@@ -343,7 +446,7 @@ int lancer_interface(int ac, char *av[])
     printf("Borne inferieure : %f\n", pointDepartX);
 
     succes = 0;
-    printf("\nFormidable !\nC'est le tour de la borne inferieure, maintenant :\n\n--->");
+    printf("\nFormidable !\nC'est le tour de la borne superieure, maintenant :\n\n--->");
     while(!succes)
     {
         fgets(chaine, 255, stdin);
@@ -363,7 +466,7 @@ int lancer_interface(int ac, char *av[])
         pas = atof(chaine);
         if(strlen(chaine) <= 1) printf("<Rien> n'est pas accepte.\n\n--->");
         else if(strcmp(chaine, "0\n") == 0) printf("Un pas de 0 n'est pas logique.\n\n--->");
-        else if(pas <= 0) printf("IL FAUT UN NOMBRE POSITIF !!!\n\n--->");
+        else if(pas <= 0) printf("IL FAUT UN VRAI NOMBRE POSITIF !!!\n\n--->");
         else
         {
             succes = 1;
@@ -376,14 +479,7 @@ int lancer_interface(int ac, char *av[])
     chargerValeurs();
 
     adaptationEchelle();
-    InitGraph(ac, av, "fenetre", 1000, 700, dessin, frappe);
+    InitGraph(ac, av, "Fen�tre", 1000, 700, dessin, frappe, sourisOnclick);
 
     printf("Ce message ne s'affichera jamais parce que OpenGL est mal fait.");
-    return 0;
 }
-
-// Pk �a coupe � la fermeture ?
-// Est-ce que l'on peut utiliser la souris ?
-
-// Refaire le main.h
-// Lib�ration

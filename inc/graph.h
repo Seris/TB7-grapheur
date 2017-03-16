@@ -1,20 +1,22 @@
+#ifndef GRAPH_GRAPH_H
+#define GRAPH_GRAPH_H
 
 /**
 * @file Graph.h
 *
-* @brief présente quelques outils d'affichage nécessaires dans le cadre de ce
+* @brief pr�sente quelques outils d'affichage n�cessaires dans le cadre de ce
 * projet.
-* Il contient la déclaration des procedures disponibles pour ouvrir une fenetre
-* et y dessiner des figures. Les coordonnées des points dans la fenetre sont
+* Il contient la d�claration des procedures disponibles pour ouvrir une fenetre
+* et y dessiner des figures. Les coordonn�es des points dans la fenetre sont
 * definies sur l'intervalle [-1;1], (-1,-1) etant le coin superieur gauche de
 * la fenetre et (1,1) le coin inferieur droit.
 *
-* Pour une démonstration de l'utilisation de ces procédures, voir le fichier
+* Pour une d�monstration de l'utilisation de ces proc�dures, voir le fichier
 * main.cpp.
 *
 */
-#include "string.h"
-#include "stdio.h"
+#include <string.h>
+#include <stdio.h>
 #include <malloc.h>
 #include "glut.h"
 #include <math.h>
@@ -42,13 +44,13 @@ struct tableau_evaluateur{
 * @param w la largeur de la fenetre
 * @param h la hauteur de la fenetre
 * @param Draw fonction qui affiche le graphique dans la fenetre
-* @param Key fonction appelée lors de l'appui sur une touche c du clavier,
+* @param Key fonction appel�e lors de l'appui sur une touche c du clavier,
 *	 c designant le code ascii de la touche
 *
 */
 void InitGraph(int ac,char *av[], const char *WinName,
                const int w, const int h, void (*Draw)(void),
-               void (*Key)(int c));
+               void (*Key)(int c), void (*Souris)(int, int));
 /**
 * line
 *
@@ -56,9 +58,9 @@ void InitGraph(int ac,char *av[], const char *WinName,
 * (x1,y1)
 *
 * @param x0 abscisse du 1er point
-* @param y0 ordonnée du 1er point
+* @param y0 ordonn�e du 1er point
 * @param x0 abscisse du 2eme point
-* @param y0 ordonnée du 2eme point
+* @param y0 ordonn�e du 2eme point
 *
 */
 void line(const float x0, const float y0, const float x1, const float y1);
@@ -67,7 +69,7 @@ void line(const float x0, const float y0, const float x1, const float y1);
 /**
 * setcolor
 *
-* Cette procedure permet de definir la couleur utilisée pour tracer les lignes.
+* Cette procedure permet de definir la couleur utilis�e pour tracer les lignes.
 * La couleur par les valeurs des composantes rouge, vert et bleue.
 *
 * @param r composante rouge
@@ -81,10 +83,10 @@ void setcolor(const float r, const float v, const float b);
 * beginlines
 *
 * Cette procedure permet de commencer le trace d'une ligne brisee composee
-* de n segments de droite définis par (n+1) points.
+* de n segments de droite d�finis par (n+1) points.
 *
 * @param x0 l'abscisse du premier point de la ligne brisee
-* @param y0 l'ordonnée du premier point de la ligne brisee
+* @param y0 l'ordonn�e du premier point de la ligne brisee
 *
 */
 void beginlines(const float x0, const float y0);
@@ -113,7 +115,7 @@ void finishlines(void);
 /**
 * bar
 *
-* Cette procédure permet de tracer un rectangle defini par son coin superieur
+* Cette proc�dure permet de tracer un rectangle defini par son coin superieur
 * gauche et son coin inferieur droit.
 *
 * @param x0 abscisse du coin superieur gauche du rectangle
@@ -127,11 +129,11 @@ void bar(const float x0, const float y0, const float x1, const float y1);
 /**
 * outtextxy
 *
-* Cette procédure permet d'ecrire une chaine de charactère s dans une zone de
-* texte définie par les coordonnées x et y
+* Cette proc�dure permet d'ecrire une chaine de charact�re s dans une zone de
+* texte d�finie par les coordonn�es x et y
 *
 * @param x abscisse de l'origine (coin gauche superieur) de la zone de texte
-* @param y ordonnée de l'origine (coin gauche superieur) de la zone de texte
+* @param y ordonn�e de l'origine (coin gauche superieur) de la zone de texte
 * @param s chaine de caracteres contenant le texte a afficher
 *
 */
@@ -147,3 +149,4 @@ float moyenne(tableau_evaluateur tab[]);
 /*void char_To_Float();
 void curseur(int a);*/
 
+#endif // GRAPH_GRAPH_H

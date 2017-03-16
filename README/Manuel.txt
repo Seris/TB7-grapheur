@@ -1,0 +1,21 @@
+------ Instructions -----
+
+Tapez la formule avec une syntaxe correcte dans le champ adapte.
+Notez ensuite les bornes qui delimiteront l'affichage sur l'axe des X.
+L'echelle sur l'axe des Y sera definie automatiquement.
+Enfin, saisissez le pas de calcul. Un petit pas correspondra a une courbe plus
+precise, mais plus longue a afficher.
+
+Une fois dans l'afficheur, utilisez les commandes suivantes pour vous deplacer:
+
+- Z, Q, S, et D pour decaler le graphe
+- O pour centrer l'origine du repere
+- '+' et '-' pour zoomer et dezoomer
+- 4 et 6 pour zoomer et dezoomer sur l'axe des 
+- 2 et 8 pour zoomer et dezoomer sur l'axe des Y
+
+- C pour adapter l'echelle automatiquement par rapport a la courbe
+- R pour recharger la courbe sur l'entierete de la fenetre
+
+Pour quitter, cliquez sur l'icone correspondante, sans oublier de liberer
+la memoire avec L.
