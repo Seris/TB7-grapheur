@@ -1,6 +1,8 @@
 #include "../inc/interface.h"
 #include "../inc/types.h"
 #include "../inc/evaluateur.h"
+#include "../inc/syntax-check.h"
+#include "../inc/test.h"
 
 float echelleX = 1.0;
 float echelleY = 1.0;
@@ -301,7 +303,7 @@ int lancer_interface(int ac, char *av[])
 {
     char formule[255];
     int succes = 1; /// CHANGER CA OMG.
-    //err_t erreur;
+    err_t erreur;
     printf("Bonjour ! Que diriez-vous d'entrer une formule ?\n\n--->");
     do
     {
@@ -313,6 +315,19 @@ int lancer_interface(int ac, char *av[])
         }
         printf("Vous avez tape : %s", formule);
 
+        listeJetons = create_test_list();
+        if(listeJetons != NULL){
+            arbre = parse_token_list(listeJetons, &erreur);
+            if(arbre != NULL){
+                succes = 1;
+                print_tree(arbre);
+            } else {
+                print_error(&erreur);
+            }
+        } else {
+            print_error(&erreur);
+        }
+
         // 1er groupe : Conversion de la formule en liste de jetons
         /*listeJetons = la1ereFonctionMDR(formule, &erreur); // Est-ce qu'il renvoie NULL en cas d'erreur ?
         if(exposerErreur(erreur) == 0)
@@ -323,29 +338,6 @@ int lancer_interface(int ac, char *av[])
                 succes = 1;
         }*/
     } while(!succes); // Tant qu'il y a une erreur
-
-
-
-    tokenarb_t arbre1, arbre2, arbre3;
-
-    arbre2.token.type = VAR;
-    arbre2.token.position = 2;
-    arbre2.gauche = NULL;
-    arbre2.droite = NULL;
-
-    arbre3.token.type = REEL;
-    arbre3.token.position = 0;
-    arbre3.token.valeur.reel = 2;
-    arbre3.gauche = NULL;
-    arbre3.droite = NULL;
-
-    arbre1.token.type = OPERATEUR;
-    arbre1.token.position = 1;
-    arbre1.token.valeur.operateur = '^';
-    arbre1.gauche = &arbre3;
-    arbre1.droite = &arbre2;
-
-    arbre = &arbre1;
 
     char chaine[255];
     succes = 0;

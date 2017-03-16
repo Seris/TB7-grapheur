@@ -195,11 +195,7 @@ void print_test_list(tokenlist_t* list){
 //sqrt(sin(4a))
 tokenlist_t* create_test_list(){
     tokenlist_t* root =
-        nvfn(SQRT,
-            nvfn(SIN,
-                nvparo(
-                    nvreel(4, nvop('*', nvcst(CST_E,
-                nvparf(NULL)))))));
+        nvfn(SIN,nvparo(nvreel(1, nvop('/', nvvar(nvparf(NULL))))));
 
     tokenlist_t* curlist = root;
     for (size_t i = 0; curlist != NULL; i++, curlist = curlist->suivant) {

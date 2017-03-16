@@ -19,7 +19,7 @@ typedef enum {
     SQRT,
     EXP, LN, LOG,
     ABS, ENT, DECIMAL,
-    FACTORIEL,
+    FACTORIEL, GAMMA
 } fonct_t;
 
 typedef enum {
