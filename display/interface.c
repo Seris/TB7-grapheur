@@ -267,7 +267,7 @@ void frappe(int c)
             break;
         }
     case 'l': // libere la memoire
-        free_arbre_token(arbre);
+        //free_arbre_token(arbre);
         supprime_tbx(points);
         supprime_tbx(valeursDerivees);
         points = NULL;
