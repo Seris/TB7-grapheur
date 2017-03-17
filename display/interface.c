@@ -10,8 +10,6 @@ extern int curseurY;
 extern int windowWidth;
 extern int windowHeight;
 
-char clique = 0;
-graphpt_t ancreGlisse;
 
 float echelleX = 1.0;
 float echelleY = 1.0;
@@ -197,6 +195,8 @@ void chargerDerivees()
 {
     graphpt_t curseur = nvPoint(2*(curseurX/(float)windowWidth)-1, -2*(curseurY/(float)windowHeight)+1, 1);
     graphpt_t curseurVersRepere = versRepere(curseur);
+    supprime_tbx(valeursDerivees);
+    valeursDerivees = NULL;
     valeursDerivees = generer_points(arbre, curseurVersRepere.x, curseurVersRepere.x+0.05, 0.06);
 }
 
@@ -248,18 +248,24 @@ void frappe(int c)
         break;
     case 'r':
         {
-            printf("RELOAD.\n");
-            int nb = ceil((pointArriveeX-pointDepartX)/pas)+1;
-            pointDepartX = versRepere(nvPoint(-1, 0, 1)).x;
-            pointArriveeX = versRepere(nvPoint(1, 0, 1)).x;
-            pas = (pointArriveeX - pointDepartX)/(nb-1);
-            chargerValeurs();
+            if (!aucunPoint)
+            {
+                printf("RELOAD.\n");
+                int nb = ceil((pointArriveeX-pointDepartX)/pas)+1;
+                pointDepartX = versRepere(nvPoint(-1, 0, 1)).x;
+                pointArriveeX = versRepere(nvPoint(1, 0, 1)).x;
+                pas = (pointArriveeX - pointDepartX)/(nb-1);
+                chargerValeurs();
+
+            }
             break;
         }
     case 'l':
         free_arbre_token(arbre);
         supprime_tbx(points);
+        supprime_tbx(valeursDerivees);
         points = NULL;
+        valeursDerivees = NULL;
         aucunPoint = 1;
         break;
     }
@@ -268,7 +274,6 @@ void frappe(int c)
 void dessin(void)
 {
     printf("Dessin.\n");
-
     char output[50];
 
     // Dessin des axes
@@ -281,22 +286,6 @@ void dessin(void)
     p2 = versBase(nvPoint(0, 10000000, 1));
     line(p1.x, p1.y, p2.x, p2.y);
 
-    // Affichage du curseur
-    graphpt_t curseur = nvPoint(2*(curseurX/(float)windowWidth)-1, -2*(curseurY/(float)windowHeight)+1, 1);
-    graphpt_t curseurVersRepere = versRepere(curseur);
-    char prefixeX[50] = "x=";
-    snprintf(output, 50, "%f", curseurVersRepere.x);
-    strcat(prefixeX, output);
-    outtextxy(0.70, -0.85, prefixeX);
-    char prefixeY[50] = "y=";
-    snprintf(output, 50, "%f", curseurVersRepere.y);
-    strcat(prefixeY, output);
-    outtextxy(0.70, -0.95, prefixeY);
-
-    setcolor(1, 0, 0);
-    line(curseur.x - 0.025, curseur.y, curseur.x + 0.025, curseur.y);
-    line(curseur.x, curseur.y - 0.025, curseur.x, curseur.y + 0.025);
-
     // Affichage du menu
     setcolor(1, 1, 1);
     outtextxy(-0.95, -0.5, "ZQSD : Deplacement");
@@ -304,9 +293,8 @@ void dessin(void)
     outtextxy(-0.95, -0.7, "C / O : Centrer / Origine");
     outtextxy(-0.95, -0.8, "R : Recharger");
     outtextxy(-0.95, -0.9, "L : Liberer la memoire");
-    outtextxy(-0.95, 0.90, formule);
 
-    // Affichage du rep�re
+    // Affichage du repère
     p1 = versRepere(nvPoint(-1, -1, 1));
     p2 = versRepere(nvPoint(1, 1, 1));
 
@@ -320,22 +308,42 @@ void dessin(void)
     outtextxy(-0.15, 0.9, output);
 
     if(!aucunPoint)
-        tracerCourbe();
+    {
+        chargerDerivees();
+        graphpt_t curseur = nvPoint(2*(curseurX/(float)windowWidth)-1, -2*(curseurY/(float)windowHeight)+1, 1);
+        graphpt_t curseurVersRepere = versRepere(curseur);
+        char prefixeX[50] = "x=";
+        snprintf(output, 50, "%f", curseurVersRepere.x);
+        strcat(prefixeX, output);
+        outtextxy(0.70, -0.75, prefixeX);
+        char prefixeY[50] = "y=";
+        snprintf(output, 50, "%f", valeursDerivees[0].y);
+        strcat(prefixeY, output);
+        outtextxy(0.70, -0.85, prefixeY);
+        char prefixeD[50] = "f'(x0)=";
+        snprintf(output, 50, "%f", ((valeursDerivees[1].y - valeursDerivees[0].y)/0.05));
+        strcat(prefixeD, output);
+        outtextxy(0.70, -0.95, prefixeD);
 
-    chargerDerivees();
-    tracerDerivee();
+        setcolor(1, 0, 0);
+        graphpt_t auPoint = versBase(valeursDerivees[0]);
+        line(curseur.x - 0.025, auPoint.y, curseur.x + 0.025, auPoint.y);
+        //line(curseur.x, curseur.y - 0.025, curseur.x, curseur.y + 0.025);
+        line(curseur.x, auPoint.y - 0.025, curseur.x, auPoint.y + 0.025);
+        tracerCourbe();
+        tracerDerivee();
+    }
 }
 
 void sourisOnclick(int x, int y)
 {
-
+    // récupère les coordonnées de la souris en cas de clic (pas utilisé)
 }
 
 /// Fonctions du menu
 
-void effEcr() // Fonction de qualit�
+void effEcr() // Fonction de qualite
 {
-    //printf("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
     #ifdef _WIN32
     system("cls");
     #else
@@ -472,7 +480,5 @@ void lancerGrapheur(int ac, char *av[])
     chargerValeurs();
 
     adaptationEchelle();
-    InitGraph(ac, av, "Fen�tre", 1000, 700, dessin, frappe, sourisOnclick);
-
-    printf("Ce message ne s'affichera jamais parce que OpenGL est mal fait.");
+    InitGraph(ac, av, "Fenetre", 1000, 700, dessin, frappe, sourisOnclick);
 }
