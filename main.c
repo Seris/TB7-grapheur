@@ -3,8 +3,6 @@
 
 #include "inc/interface.h"
 
-extern tokenarb_t* arbre;
-
 int main(int argc, char* argv[]){
     menu(argc, argv);
 
