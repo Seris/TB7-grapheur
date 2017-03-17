@@ -165,7 +165,7 @@ tokenarb_t* parse_expression(tokenlist_t** elem_cur, err_t* err){
 
 /**
  * Fonction d'entrée du module traitant une liste de token et en retourne
- * un arbre binaire si aucune erreur n'est trouvée. 
+ * un arbre binaire si aucune erreur n'est trouvée.
  * @param  list La liste qui va être traitée
  * @param  err  Un pointeur vers une erreur. Elle sera remplit en conséquence même
  *              si aucune erreur n'est trouvée. La mémoire n'a donc pas besoin d'être

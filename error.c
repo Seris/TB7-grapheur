@@ -21,35 +21,35 @@ void print_error(char* formula, err_t err){
 
         switch (err.type) {
             case PAR_F_ATTENDU:
-            printf("Parenthèse fermante attendue\n");
+            printf("Une parenthèse fermante est attendue.\n");
             break;
 
             case EXPR_ATTENDU:
-            printf("Expression attendue\n");
+            printf("Une expression est attendue.\n");
             break;
 
             case MANQ_TOK:
-            printf("Token manquant\n");
+            printf("Un token est manquant.\n");
             break;
 
             case TOKEN_NON_ATTENDU:
-            printf("Token non attendu\n");
+            printf("Le token n'est pas attendu.\n");
             break;
 
             case MAUV_REEL:
-            printf("Réel mal formatté\n");
+            printf("Le réel est mal formaté.\n");
             break;
 
             case MAUV_FONC_CONST:
-            printf("Fonction ou constante inconnue\n");
+            printf("La fonction ou constante est inconnue.\n");
             break;
 
             case MAUV_CHAR:
-            printf("Caractère non attendu\n");
+            printf("Le caractère est non attendu.\n");
             break;
 
             default:
-            printf("WTFFFFF");
+            printf("Erreur indefinie.");
             exit(EXIT_FAILURE);
         }
     }
