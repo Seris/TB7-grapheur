@@ -43,7 +43,7 @@ typedef enum {
 
 
 typedef union {
-    double reel;
+    float reel;
     char operateur;
     fonct_t fonction;
     const_t constante;
@@ -70,8 +70,8 @@ struct tokenlist_st {
 
 
 typedef struct {
-    double x;
-    double y;
+    float x;
+    float y;
     char valide;
 } graphpt_t;
 
