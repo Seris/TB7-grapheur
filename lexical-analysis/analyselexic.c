@@ -441,7 +441,6 @@ tokenlist_t * analyselexical(char * tableau , err_t * erreur)
     erreur -> type = NO_ERR; // On initialise le type erreur, permettant de v�rifier � chaque incr�mentation s'il n'y a pas d'erreur
 
     int i;
-    int position=1;
 
     for(i = 0; tableau[i] != '\0' && erreur -> type == NO_ERR; i++) //Incr�mente caract�re par caract�re en v�rifiant si l'�l�ment existe : ajout dans la liste
     {
@@ -453,24 +452,20 @@ tokenlist_t * analyselexical(char * tableau , err_t * erreur)
             case '/':
             case '%':
             case '^':
-              token_p = ajout_operateur(token_p , tableau[i] , position); //Ajoute l'op�rateur dans la liste et renvoi son adresse
-              position++; // Incr�mente la position de l'�l�ment
+              token_p = ajout_operateur(token_p , tableau[i] , i); //Ajoute l'op�rateur dans la liste et renvoi son adresse
               break;
 
             case '(':
-                token_p = ajout_parenthese_ouvrante( token_p , position) ; // M�me principe
-                position++;
+                token_p = ajout_parenthese_ouvrante( token_p , i) ; // M�me principe
                 break;
 
             case ')':
-                token_p = ajout_parenthese_fermante( token_p , position) ; // M�me principe
-                position++;
+                token_p = ajout_parenthese_fermante( token_p , i) ; // M�me principe
                 break;
 
             case 'x':
             case 'X':
-               token_p = ajout_variable( token_p , position); // M�me principe
-               position++;
+               token_p = ajout_variable( token_p , i); // M�me principe
                break;
 
             case ' ': // Casse le switch si l'on a un espace
@@ -483,32 +478,30 @@ tokenlist_t * analyselexical(char * tableau , err_t * erreur)
                    char fonction_recup [20];
 
                    fonction_recuperation( tableau, &i , fonction_recup); // r�cup�re la saisie (lettres) de l'utilisateur
-                   token_p = ajout_fonction_constante( token_p , fonction_recup , liste_fonctions , liste_constantes , position, erreur); // renvoi l'adresse de la nouvelle liste si la saisie de la fonction ou constante a �t� correctement �tablie
+                   token_p = ajout_fonction_constante( token_p , fonction_recup , liste_fonctions , liste_constantes , i, erreur); // renvoi l'adresse de la nouvelle liste si la saisie de la fonction ou constante a �t� correctement �tablie
                    i--;  // le 'i' correspond au dernier �l�ment de la ou les lettre(s) saisie(s)
-                   position++; // Incr�mente la position o� �t� la fonctio saisie
                }
                else if (verif_reel (tableau + i) ) // V�rifie si le caract�re est un nombre
                     {
                         int position_reel ; // Correspond � la position du lastcharacter de 'strtof', � partir du caract�re en question (soit ici, le premier)
                         float r = renvoi_nombre_si_pas_erreur(tableau+i , &position_reel); // renvoi le reel dans la variable r si pas d'erreur
-                        token_p = ajout_reel(token_p , position, r); // renvoi l'adresse de la nouvelle liste
+                        token_p = ajout_reel(token_p , i, r); // renvoi l'adresse de la nouvelle liste
 
                         if (verif_list_null (token_p) ) // Si la liste est vide, soit, une liste d�truite d� � une ou plusieurs erreurs, alors on modifie le type d'erreur permettant d'arr�ter l'incr�mentation dans le tableau
                         {
                             erreur -> type = MAUV_REEL;
-                            erreur -> token.position = position; //Ajoute la position o� l'erreur est: modifi� dans la strucutre erreur
+                            erreur -> token.position = i; //Ajoute la position o� l'erreur est: modifi� dans la strucutre erreur
                         }
                         else
                         {
                             i = i + position_reel -1 ; // permet de r�cuperer la position du 'i' du dernier caract�re du reel saisi
-                            position++; // Incr�mente la position o� �t� le reel
                         }
                     }
                     else // Sinon, si aucun de ces cas l� existe, on d�truit la liste
                     {
                         printf("ERREUR ! Element inconnu\n") ;
                         erreur -> type = MAUV_CHAR ; // change le type d'erreur dans la structure 'erreur'
-                        erreur -> token.position = position; // ajoute la position o� l'erreur est : modif� dans la structure 'erreur'
+                        erreur -> token.position = i; // ajoute la position o� l'erreur est : modif� dans la structure 'erreur'
                         printf("Destruction de la liste\n");
                         token_p = detruire_liste(token_p);
                     }
