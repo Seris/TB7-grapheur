@@ -53,9 +53,10 @@ tokenarb_t* parse_operator(tokenlist_t** elem_cur){
 /**
  * Traite une fonction et s'occupe de traiter le token suivant qui lui est lié
  * @param  elem_cur curseur dans la liste qui sera incrémentée par la fonction
- * @param  err      MANQ_TOK: aucun token ne suit la fonction
- *                  e.g f(x) = log
- * @return          [description]
+ * @param  err      EXPR_ATTENDU: aucune expression après la fonction
+ *                  e.g "log"
+ *                  Toutes les erreurs possibles dans une expression (cf. parse_expression)
+ * @return          Le node correspondant à la fonction en question
  */
 tokenarb_t* parse_function(tokenlist_t** elem_cur, err_t* err){
     tokenlist_t* elem = *elem_cur;
@@ -84,6 +85,7 @@ tokenarb_t* parse_function(tokenlist_t** elem_cur, err_t* err){
  * @param  err      TOKEN_NON_ATTENDU: e.g "( 5 * )", "( )", "( 5 * 4 + )" etc..
  *                  PAR_F_ATTENDU: parenthèse fermante attendue mais un autre token trouvé
  *                  MANQ_TOK: e.g "( 5 *", "("
+ *                  Toutes les erreurs possibles dans une expression (cf. parse_expression)
  * @return          le node correspondant à l'opération ou feuille
  */
 tokenarb_t* parse_parenthesis(tokenlist_t** elem_cur, err_t* err){
