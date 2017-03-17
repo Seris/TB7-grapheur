@@ -411,8 +411,12 @@ void menu(int ac, char *av[])
 }
 
 // lance le grapheur avec des parmètres définis globalement
-void lancerGrapheur(int ac, char *av[])
+void lancerGrapheur(int ac, char *av[], tokenarb_t * a, float debut, float fin, float p)
 {
+    arbre = a;
+    pointDepartX = debut;
+    pointArriveeX = fin;
+    pas = p;
     chargerValeurs();
     adaptationEchelle();
     InitGraph(ac, av, "Fenetre", 1000, 700, dessin, frappe, sourisOnclick);
@@ -488,5 +492,5 @@ void lancerQuestions(int ac, char *av[])
     }
     printf("Pas de calcul : %f\n", pas);
 
-    lancerGrapheur(ac, av); // met en route l'initialisation du grapheur
+    lancerGrapheur(ac, av, arbre, pointDepartX, pointArriveeX, pas); // met en route l'initialisation du grapheur
 }

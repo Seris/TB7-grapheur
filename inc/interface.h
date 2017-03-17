@@ -55,7 +55,7 @@ void lireFichier(char * adresse);
 void menu(int ac, char *av[]);
 
 // lance le grapheur avec des parmètres définis globalement
-void lancerGrapheur(int ac, char *av[]);
+void lancerGrapheur(int ac, char *av[], tokenarb_t * a, float debut, float fin, float pas);
 
 // lance la saisie utilisateur
 void lancerQuestions(int ac, char *av[]);
