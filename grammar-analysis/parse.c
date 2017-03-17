@@ -81,9 +81,10 @@ tokenarb_t* parse_function(tokenlist_t** elem_cur, err_t* err){
  * (ici feuille désigne des tokens de type CONSTANTE, VAR ou REEL)
  * @param  elem_cur Curseur dans la liste chainée qui sera incrémentée par la
  *                  fonction
- * @param  err      TOKEN_NON_ATTENDU: e.g ( 5 * ), ( ), ( 5 * 4 + ), ( 5 * 4 + 3 etc..
- *                  MANQ_TOK: parenthèse fermante attendue mais un autre token trouvé
- * @return          [description]
+ * @param  err      TOKEN_NON_ATTENDU: e.g "( 5 * )", "( )", "( 5 * 4 + )" etc..
+ *                  PAR_F_ATTENDU: parenthèse fermante attendue mais un autre token trouvé
+ *                  MANQ_TOK: e.g "( 5 *", "("
+ * @return          le node correspondant à l'opération ou feuille
  */
 tokenarb_t* parse_parenthesis(tokenlist_t** elem_cur, err_t* err){
     tokenlist_t* elem = *elem_cur;
@@ -123,10 +124,12 @@ tokenarb_t* parse_parenthesis(tokenlist_t** elem_cur, err_t* err){
 }
 
 /**
- * [parse_expression description]
- * @param  elem_cur [description]
- * @param  err      [description]
- * @return          [description]
+ * Traite une expression qui peut consister à une opération entre parenthèses
+ * ou à une feuille solo
+ * @param  elem_cur Curseur de la liste de token
+ * @param  err      EXPR_ATTENDU: si l'expression ne commence pas par une parenthèse
+ *                  ouvrante, une feuille ou une fonction
+ * @return          Le node de l'arbre correspondant à l'expression
  */
 tokenarb_t* parse_expression(tokenlist_t** elem_cur, err_t* err){
     tokenlist_t* elem = *elem_cur;
@@ -159,10 +162,14 @@ tokenarb_t* parse_expression(tokenlist_t** elem_cur, err_t* err){
 }
 
 /**
- * [parse_token_list description]
- * @param  list [description]
- * @param  err  [description]
- * @return      [description]
+ * Fonction d'entrée du module traitant une liste de token et en retourne
+ * un arbre binaire si aucune erreur n'est trouvée. 
+ * @param  list La liste qui va être traitée
+ * @param  err  Un pointeur vers une erreur. Elle sera remplit en conséquence même
+ *              si aucune erreur n'est trouvée. La mémoire n'a donc pas besoin d'être
+ *              initialisée
+ * @return      Un arbre binaire si aucune erreur. NULL sinon. L'arbre doit être nettoyé
+ *              de la mémoire avec la fonction free_arbre_token
  */
 tokenarb_t* parse_token_list(tokenlist_t* list, err_t* err){
     tokenlist_t* elem = list;
